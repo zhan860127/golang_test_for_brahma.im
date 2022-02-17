@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?><sqlb_project><db path="C:/Users/USER/Desktop/go/golang_test_for_brahma.im/weather.db" readonly="0" foreign_keys="1" case_sensitive_like="0" temp_store="0" wal_autocheckpoint="1000" synchronous="2"/><attached/><window><main_tabs open="structure browser pragmas query" current="0"/></window><tab_structure><column_width id="0" width="300"/><column_width id="1" width="0"/><column_width id="2" width="125"/><column_width id="3" width="5625"/><column_width id="4" width="0"/><expanded_item id="0" parent="1"/><expanded_item id="1" parent="1"/><expanded_item id="2" parent="1"/><expanded_item id="3" parent="1"/></tab_structure><tab_browse><current_table name="4,7:mainWeather"/><default_encoding codec=""/><browse_table_settings/></tab_browse><tab_sql><sql name="SQL 1"></sql><sql name="Edit View weathers">DROP VIEW &quot;main&quot;.&quot;weathers&quot;;
+CREATE VIEW weatherss AS 
+select a.City,b.tempture jan,c.tempture feb,d.tempture march,e.tempture apr,f.tempture june,g.tempture july,h.tempture Aug,i.tempture sep,j.tempture oct,k.tempture nov,l.tempture dec
+from Weather a
+INNER JOIN Weather b on a.City=b.City and b.month=1 and a.month=1
+INNER JOIN Weather c on a.City=c.City and c.month=2 
+INNER JOIN Weather d on a.City=d.City and d.month=3
+INNER JOIN Weather e on a.City=e.City and e.month=4
+INNER JOIN Weather f on a.City=f.City and f.month=5
+INNER JOIN Weather g on a.City=g.City and g.month=6
+INNER JOIN Weather h on a.City=h.City and h.month=8
+INNER JOIN Weather i on a.City=i.City and i.month=9
+INNER JOIN Weather j on a.City=j.City and j.month=10
+INNER JOIN Weather k on a.City=k.City and k.month=11
+INNER JOIN Weather l on a.City=l.City and l.month=12</sql><current_tab id="0"/></tab_sql></sqlb_project>

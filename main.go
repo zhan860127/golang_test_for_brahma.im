@@ -1,14 +1,16 @@
 package main
 
 import (
-	"github.com/gofiber/fiber/v2"
-
+	"database/sql"
 	"fmt"
 
-	"github.com/zhan860127/golang_test_for_brahma.im/database"
-	"github.com/zhan860127/golang_test_for_brahma.im/weather"
+	_ "github.com/mattn/go-sqlite3"
 
-	"github.com/jinzhu/gorm"
+	"github.com/gofiber/fiber/v2"
+
+	"moduledemo/database"
+	"moduledemo/weather"
+
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
 )
 
@@ -19,26 +21,42 @@ func main() {
 
 	setupRoutes(app)
 
-	app.Listen(9000)
 	fmt.Printf("hellow")
 }
 
 func initDatabase() {
-	var err error
-	database.DBConn, err = gorm.Open("sqlite3", "weather.db")
-	if err != nil {
-		panic("Failed to connect to database")
-	}
-	fmt.Println("Database connection successfully opened")
+	//var err error
+	_, err := sql.Open("sqlite3", "weather.db")
+	checkErr(err)
 
-	database.DBConn.AutoMigrate(&weather.Weather{})
-	fmt.Println("Database Migrated")
+	//	rows, err := db.Query("SELECT* FROM Weather")
+	checkErr(err)
+
+	//db := database.DBConn
+	fmt.Println("Database connection successfully opened")
+	//fmt.Println(rows)
+	//var weather weather.Weather
 
 }
 
 func setupRoutes(app *fiber.App) {
 	app.Get("/api/v1/weather", weather.Getweathers)
-	app.Get("/api/v1/weather/:id", weather.Getweather)
-	app.Post("/api/v1/weather", weather.Newweather)
-	app.Delete("/api/v1/weather/:id/:month", weather.Deleteweather)
+	//	app.Static("/", "./weather.html")
+	app.Post("/", weather.Newtemp)
+
+	app.Get("/:value", func(c *fiber.Ctx) error {
+		return c.SendString("value: " + c.Params("value"))
+	})
+
+	app.Get("/api/v1/weather/:City/:month", weather.Getweather)
+	app.Get("/api/v1/del/:City/:month", weather.Deltemp)
+	//	app.Post("/api/v1/weather", weather.Newweather)
+	//	app.Delete("/api/v1/weather/:id/:month", weather.Deleteweather)
+	app.Listen(":7802")
+}
+
+func checkErr(err error) {
+	if err != nil {
+		panic(err)
+	}
 }

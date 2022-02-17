@@ -1,25 +1,83 @@
 package weather
 
 import (
-	"github.com/gofiber/fiber"
-	"github.com/jinzhu/gorm"
-	"github.com/zhan860127/golang_test_for_brahma.im/database"
+	"database/sql"
+	"fmt"
+	"log"
+	"net/url"
+	"strconv"
+
+	"github.com/gofiber/fiber/v2"
+	_ "github.com/mattn/go-sqlite3"
 )
 
 type Weather struct {
-	gorm.Model
-	City     string `json:"City"`
-	tempture string `json:"tempture"`
-	month    int    `json:"month"`
+	City     string  `json:"city" xml:"city" form:"city"`
+	Month    int     `json:"month" xml:"month" form:"month"`
+	Tempture float64 `json:"tempture" xml:"tempture" form:"tempture"`
 }
 
-func GetBooks(c *fiber.Ctx) {
-	db := database.DBConn
-	var Weather []Book
-	db.Find(&books)
-	c.JSON(books)
+type Weathers struct {
+	City string  `json:"City"`
+	Jan  float64 `json:"Jan"`
+	Feb  float64 `json:"Feb"`
+	Mar  float64 `json:"Mar"`
+	Apr  float64 `json:"Apr"`
+	Jun  float64 `json:"Jun"`
+	Jul  float64 `json:"Jul"`
+	Aug  float64 `json:"Aug"`
+	Sep  float64 `json:"Sep"`
+	Oct  float64 `json:"Oct"`
+	Nov  float64 `json:"Noc"`
+	Dec  float64 `json:"Dec"`
 }
 
+func Getweathers(c *fiber.Ctx) error {
+	db, err := sql.Open("sqlite3", "weather.db")
+	checkErr(err)
+	rows, err := db.Query("SELECT City,jan,feb,march,apr,june,july,Aug,sep,oct,nov,dec FROM weatherss")
+	checkErr(err)
+	var b []Weathers
+
+	for rows.Next() {
+		a := new(Weathers)
+		rows.Scan(&a.City, &a.Jan, &a.Feb, &a.Mar, &a.Apr, &a.Jun, &a.Jul, &a.Aug, &a.Sep, &a.Oct, &a.Nov, a.Dec)
+		//fmt.Printf("%v %v %v %v %v %v %v\n", a.City, a.Month, a.Tempture)
+		b = append(b, *a)
+
+	}
+
+	defer rows.Close()
+	return c.JSON(b)
+}
+
+func Getweather(c *fiber.Ctx) error {
+	db, err := sql.Open("sqlite3", "weather.db")
+	checkErr(err)
+
+	a := c.Params("month")
+	//	month, _ := strconv.Atoi(a)
+	city := c.Params("City")
+	//	fmt.Printf(city)
+	text, _ := url.QueryUnescape(city)
+	//	fmt.Printf("%v %T", month, month)
+	str := "select tempture from Weather where City='" + text + "' AND month=" + a
+	//	fmt.Println(str)
+	rows, err := db.Query(str)
+	//	fmt.Println(rows)
+	checkErr(err)
+	//	fmt.Println(rows)
+	var temp float64
+
+	for rows.Next() {
+		rows.Scan(&temp)
+		fmt.Println(temp)
+	}
+	strKm := strconv.FormatFloat(temp, 'f', 1, 64)
+	return c.SendString(string(strKm))
+}
+
+/*
 func GetBook(c *fiber.Ctx) {
 	id := c.Params("id")
 	db := database.DBConn
@@ -27,20 +85,62 @@ func GetBook(c *fiber.Ctx) {
 	db.Find(&book, id)
 	c.JSON(book)
 }
+*/
 
-func NewBook(c *fiber.Ctx) {
-	db := database.DBConn
+func Newtemp(c *fiber.Ctx) error {
+	db, err := sql.Open("sqlite3", "weather.db")
+	checkErr(err)
+	fmt.Println(c.Get("authorization"))
+	weather := new(Weather)
+	if err := c.BodyParser(weather); err != nil {
+		//		fmt.Printf(weather.City)
 
-	book := new(Book)
-	if err := c.BodyParser(book); err != nil {
-		c.Status(503).Send(err)
-		return
+		log.Fatal(weather)
+		//		fmt.Printf(weather.City)
+	}
+	//fmt.Println(user.Name)
+	/*
+		month := c.Params("month")
+		city := c.Params("City")
+		tempture := c.Params("tempture")
+
+		text, _ := url.QueryUnescape(city)
+
+		row, err := db.Query("insert into weather (city,tempture,month) values (" + text + "," + month + "',month=" + month + ",tempture=" + tempture)
+	*/
+	s := fmt.Sprintf("%f", weather.Tempture) // s == "123.456000"
+	fmt.Println("123")
+	row, err := db.Query("insert into weather (city,tempture,month) values (" + weather.City + "," + s + "," + strconv.Itoa(weather.Month))
+
+	checkErr(err)
+
+	if row != nil {
+		return c.SendString("成功新增")
+	} else {
+		return c.SendString("刪除失敗")
 	}
 
-	db.Create(&book)
-	c.JSON(book)
 }
 
+func Deltemp(c *fiber.Ctx) error {
+	db, err := sql.Open("sqlite3", "weather.db")
+	checkErr(err)
+	month := c.Params("month")
+	city := c.Params("City")
+	text, _ := url.QueryUnescape(city)
+
+	row, err := db.Query("delete from weather where city='" + text + "'and month=" + month)
+	checkErr(err)
+
+	if row != nil {
+		return c.SendString("成功刪除")
+	} else {
+		return c.SendString("刪除失敗")
+	}
+
+}
+
+/*
 func DeleteBook(c *fiber.Ctx) {
 	id := c.Params("id")
 	db := database.DBConn
@@ -53,4 +153,11 @@ func DeleteBook(c *fiber.Ctx) {
 	}
 	db.Delete(&book)
 	c.Send("Book successfully deleted")
+}
+*/
+
+func checkErr(err error) {
+	if err != nil {
+		panic(err)
+	}
 }
