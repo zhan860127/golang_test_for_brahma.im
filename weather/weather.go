@@ -2,11 +2,14 @@ package weather
 
 import (
 	"database/sql"
+	"encoding/base64"
 	"fmt"
 	"net/url"
 	"strconv"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/kevinburke/nacl"
+	"github.com/kevinburke/nacl/secretbox"
 	_ "github.com/mattn/go-sqlite3"
 )
 
@@ -14,6 +17,11 @@ type Weather struct {
 	City     string  `json:"city" xml:"city" form:"city"`
 	Month    int     `json:"month" xml:"month" form:"month"`
 	Tempture float64 `json:"tempture" xml:"tempture" form:"tempture"`
+}
+
+type User struct {
+	Username string `json:"username" xml:username"" form:"username"`
+	Password string `json:"password" xml:"password" form:"password"`
 }
 
 type Weathers struct {
@@ -46,8 +54,7 @@ func Getweathers(c *fiber.Ctx) error {
 		b = append(b, *a)
 
 	}
-
-	defer rows.Close()
+	db.Close()
 	return c.JSON(b)
 }
 
@@ -125,6 +132,7 @@ func Newtemp(c *fiber.Ctx) error {
 
 		s := fmt.Sprintf("%f", weather.Tempture) // s == "123.456000"
 		_, err = db.Exec("Insert into Weather (city,tempture,month) values ('" + weather.City + "'," + s + "," + strconv.Itoa(weather.Month) + ")")
+		fmt.Println(err)
 	} else {
 		return fiber.NewError(404, "值不可為空")
 	}
@@ -132,6 +140,51 @@ func Newtemp(c *fiber.Ctx) error {
 		return c.SendString("成功新增")
 	} else {
 		return fiber.NewError(404, "Sorry,新增失敗")
+	}
+
+}
+
+func Signin(c *fiber.Ctx) error {
+	db, err := sql.Open("sqlite3", "weather.db")
+	checkErr(err)
+	fmt.Println(c.Get("authorization"))
+	user := new(User)
+	//fmt.Println(c.Body())
+	err = c.BodyParser(user)
+	//fmt.Println(user.Name)
+	/*
+		month := c.Params("month")
+		city := c.Params("City")
+		tempture := c.Params("tempture")
+
+		text, _ := url.QueryUnescape(city)
+
+		row, err := db.Query("insert into weather (city,tempture,month) values (" + text + "," + month + "',month=" + month + ",tempture=" + tempture)
+	*/
+	if err == nil && user != nil {
+
+		println(user.Username)
+		println(user.Password)
+		//		str := "select Username from User where Username='" + user.Username + "'and Password=" + "'" + user.Password + "'"
+		row, err := db.Query("select * from User where Username='" + user.Username + "'and Password=" + "'" + user.Password + "'")
+		println(err)
+		println(&row)
+		j := 0
+		for row.Next() {
+
+			j = j + 1
+		}
+
+		if j > 0 && err == nil {
+
+			return (c.Redirect("/"))
+		} else {
+			return (c.Redirect("./sign/"))
+
+		}
+
+	} else {
+		return fiber.NewError(404, "值不可為空")
 	}
 
 }
@@ -245,4 +298,26 @@ func checkErr(err error) {
 	if err != nil {
 		panic(err)
 	}
+}
+
+// @Summary encrpt message
+// @Tags Encrpt
+// @version 1.0
+// @produce text/plain
+// @param message header string true "message"
+// @Success 200 {string} 0.0 "成功加密訊息"
+// @Router /encrpt/{message} [get]
+func Encrpt(c *fiber.Ctx) error {
+	key, err := nacl.Load("6368616e676520746869732070617373776f726420746f206120736563726574")
+	if err != nil {
+		panic(err)
+	}
+	message := c.Params("message")
+	data := []byte(message)
+	encrypted := secretbox.EasySeal(data, key)
+
+	encrypted_message := string(base64.StdEncoding.EncodeToString(encrypted))
+	fmt.Println(encrypted_message)
+	return c.SendString(encrypted_message)
+
 }

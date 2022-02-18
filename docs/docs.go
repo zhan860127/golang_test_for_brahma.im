@@ -201,6 +201,34 @@ const docTemplate_swagger = `{
                     }
                 }
             }
+        },
+        "/encrpt/{message}": {
+            "get": {
+                "produces": [
+                    "text/plain"
+                ],
+                "tags": [
+                    "Encrpt"
+                ],
+                "summary": "encrpt message",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "message",
+                        "name": "message",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "成功加密訊息",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
         }
     }
 }`

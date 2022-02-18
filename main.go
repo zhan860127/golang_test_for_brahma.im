@@ -57,13 +57,16 @@ func initDatabase() {
 func setupRoutes(app *fiber.App) {
 	app.Get("/api/v1/weather", weather.Getweathers)
 	app.Static("/", "./weather.html")
+	app.Static("/sign", "./weather/index.html")
+	app.Post("/Signin", weather.Signin)
+
 	app.Post("/post", weather.Newtemp)
 	app.Get("/api/v1/new/:City/:month/:tempture", weather.Newtemp_api)
 	app.Get("/api/v1/weather/:City/:month", weather.Getweather)
 	app.Get("/api/v1/modify/:City/:month/:tempture", weather.Mod_temp)
 	app.Get("/api/v1/del/:City/:month", weather.Deltemp)
 	app.Get("/swagger/*", swagger.HandlerDefault) // default
-
+	app.Get("/encrpt/:message", weather.Encrpt)
 	app.Use(redirect.New(redirect.Config{
 		Rules: map[string]string{
 			"/post": "/	",

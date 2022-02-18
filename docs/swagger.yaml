@@ -130,4 +130,22 @@ paths:
       summary: Get City_month Tempture
       tags:
       - Weather
+  /encrpt/{message}:
+    get:
+      parameters:
+      - description: message
+        in: header
+        name: message
+        required: true
+        type: string
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: 成功加密訊息
+          schema:
+            type: string
+      summary: encrpt message
+      tags:
+      - Encrpt
 swagger: "2.0"
