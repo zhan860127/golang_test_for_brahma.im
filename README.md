@@ -9,7 +9,7 @@ $ go run main.go
 The server will start  at [Demo_Site](https://localhost:7800)
 
 ## API Document
-Run it, and browser to http://localhost:7800/swagger, you can see Swagger 2.0 Api documents.
+Run it, and browser to http://127.0.0.1/7800/swagger, you can see Swagger 2.0 Api documents.
 
 ## Avarage implment
 
