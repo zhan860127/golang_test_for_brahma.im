@@ -3,7 +3,6 @@ package weather
 import (
 	"database/sql"
 	"fmt"
-	"log"
 	"net/url"
 	"strconv"
 
@@ -105,29 +104,13 @@ func GetBook(c *fiber.Ctx) {
 	c.JSON(book)
 }
 */
-// @Summary create the tempture in city on month
-// @Tags Weather
-// @version 1.0
-// @produce text/plain
-// @param City header string true "City"
-// @param month path int true "month"
-// @param tempture path number true "tempture"
-// @Success 200 {string} Sorry,not found! "成功新增"
-// @Failure 404 {string} Sorry,not  "查詢失敗"
-// @Router /api/v1/new/{City}/{month}/{tempture} [get]
 func Newtemp(c *fiber.Ctx) error {
 	db, err := sql.Open("sqlite3", "weather.db")
 	checkErr(err)
 	fmt.Println(c.Get("authorization"))
 	weather := new(Weather)
 	//fmt.Println(c.Body())
-	if err := c.BodyParser(weather); err != nil {
-		//		fmt.Printf(weather.City)
-
-		log.Fatal(weather)
-		//		fmt.Printf(weather.City)
-
-	}
+	err = c.BodyParser(weather)
 	//fmt.Println(user.Name)
 	/*
 		month := c.Params("month")
@@ -138,10 +121,14 @@ func Newtemp(c *fiber.Ctx) error {
 
 		row, err := db.Query("insert into weather (city,tempture,month) values (" + text + "," + month + "',month=" + month + ",tempture=" + tempture)
 	*/
-	s := fmt.Sprintf("%f", weather.Tempture) // s == "123.456000"
-	row, err := db.Exec("Insert into Weather (city,tempture,month) values ('" + weather.City + "'," + s + "," + strconv.Itoa(weather.Month) + ")")
+	if err == nil && weather != nil {
 
-	if row != nil {
+		s := fmt.Sprintf("%f", weather.Tempture) // s == "123.456000"
+		_, err = db.Exec("Insert into Weather (city,tempture,month) values ('" + weather.City + "'," + s + "," + strconv.Itoa(weather.Month) + ")")
+	} else {
+		return fiber.NewError(404, "值不可為空")
+	}
+	if err == nil {
 		return c.SendString("成功新增")
 	} else {
 		return fiber.NewError(404, "Sorry,新增失敗")
@@ -176,6 +163,16 @@ func Deltemp(c *fiber.Ctx) error {
 
 }
 
+// @Summary create the tempture in city on month
+// @Tags Weather
+// @version 1.0
+// @produce text/plain
+// @param City header string true "City"
+// @param month path int true "month"
+// @param tempture path number true "tempture"
+// @Success 200 {string} Sorry,not found! "成功新增"
+// @Failure 404 {string} Sorry,not  "查詢失敗"
+// @Router /api/v1/new/{City}/{month}/{tempture} [get]
 func Newtemp_api(c *fiber.Ctx) error {
 	db, err := sql.Open("sqlite3", "weather.db")
 	checkErr(err)

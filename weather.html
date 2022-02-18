@@ -10,16 +10,31 @@
             white-space: pre-wrap;
             word-wrap: break-word;
         }
+
+        body,
+        html {
+            background: white;
+            text-align: center;
+        }
+
+        th,
+        td {
+            font-size: 15px;
+            width: 100px;
+            text-align: center;
+
+
+        }
     </style>
     <title></title>
 </head>
 
 <body>
-    <a href="http://localhost:7800/swagger/index.html">API 文件</a>
-    <div class="apiResult">
-        <h2> 氣溫圖</h2>
-    </div>
+    <a style="font-size:12 px;" href="http://localhost:7800/swagger/index.html">API 文件</a>
+    <h2>氣溫查詢實作</h2>
+
     <form action="/post" method="post">
+        <h5>新增城市的溫度</h5>
         城市:<input type="text" name="city">
         氣溫:<input type="text" οnkeyup="this.value=this.value.replace(/\D/g,'')" name="tempture">
         月份:<input type="number" name="month">
@@ -66,4 +81,43 @@
             return tb;
         }, document.createElement('table'));
     }
+</script>
+
+<script type="text/javascript">
+    window.onload = function () {
+        var j = 0
+        var total = 0.0
+
+        document.onmousedown = function (e) { //点击获取表格中的值
+            if (isNaN(parseFloat(e.target.innerHTML))) { }
+            else {
+
+                j++
+                total = parseFloat(e.target.innerHTML) + total
+                console.log(j)
+                console.log(total)
+                console.log(e.target.innerHTML)
+                e.target.style.background = 'yellow'
+                if (j === 3) {
+                    delay(500).then(function () {
+                        alert(total / 3)
+                        j = 0
+                        total = 0
+
+                        $('td').css('background-color', 'white');
+
+                    })
+
+
+                }
+            }
+        }
+
+    }
+
+    var delay = function (s) {
+        return new Promise(function (resolve, reject) {
+            setTimeout(resolve, s);
+        });
+    };
 </script>
