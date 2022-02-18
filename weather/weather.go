@@ -28,7 +28,7 @@ type Weathers struct {
 	Aug  float64 `json:"Aug"`
 	Sep  float64 `json:"Sep"`
 	Oct  float64 `json:"Oct"`
-	Nov  float64 `json:"Noc"`
+	Nov  float64 `json:"Nov"`
 	Dec  float64 `json:"Dec"`
 }
 
@@ -41,8 +41,9 @@ func Getweathers(c *fiber.Ctx) error {
 
 	for rows.Next() {
 		a := new(Weathers)
-		rows.Scan(&a.City, &a.Jan, &a.Feb, &a.Mar, &a.Apr, &a.Jun, &a.Jul, &a.Aug, &a.Sep, &a.Oct, &a.Nov, a.Dec)
+		rows.Scan(&a.City, &a.Jan, &a.Feb, &a.Mar, &a.Apr, &a.Jun, &a.Jul, &a.Aug, &a.Sep, &a.Oct, &a.Nov, &a.Dec)
 		//fmt.Printf("%v %v %v %v %v %v %v\n", a.City, a.Month, a.Tempture)
+		//	fmt.Println(a)
 		b = append(b, *a)
 
 	}
@@ -92,11 +93,13 @@ func Newtemp(c *fiber.Ctx) error {
 	checkErr(err)
 	fmt.Println(c.Get("authorization"))
 	weather := new(Weather)
+	//fmt.Println(c.Body())
 	if err := c.BodyParser(weather); err != nil {
 		//		fmt.Printf(weather.City)
 
 		log.Fatal(weather)
 		//		fmt.Printf(weather.City)
+
 	}
 	//fmt.Println(user.Name)
 	/*
@@ -109,15 +112,12 @@ func Newtemp(c *fiber.Ctx) error {
 		row, err := db.Query("insert into weather (city,tempture,month) values (" + text + "," + month + "',month=" + month + ",tempture=" + tempture)
 	*/
 	s := fmt.Sprintf("%f", weather.Tempture) // s == "123.456000"
-	fmt.Println("123")
-	row, err := db.Query("insert into weather (city,tempture,month) values (" + weather.City + "," + s + "," + strconv.Itoa(weather.Month))
-
-	checkErr(err)
+	row, err := db.Exec("Insert into Weather (city,tempture,month) values ('" + weather.City + "'," + s + "," + strconv.Itoa(weather.Month) + ")")
 
 	if row != nil {
 		return c.SendString("成功新增")
 	} else {
-		return c.SendString("刪除失敗")
+		return c.SendString("新增失敗")
 	}
 
 }
@@ -129,13 +129,54 @@ func Deltemp(c *fiber.Ctx) error {
 	city := c.Params("City")
 	text, _ := url.QueryUnescape(city)
 
-	row, err := db.Query("delete from weather where city='" + text + "'and month=" + month)
+	row, err := db.Prepare("delete from Weather where city='" + text + "'and month=" + month)
 	checkErr(err)
-
-	if row != nil {
+	_, err = row.Exec()
+	if err != nil {
 		return c.SendString("成功刪除")
 	} else {
 		return c.SendString("刪除失敗")
+	}
+
+}
+
+func Newtemp_api(c *fiber.Ctx) error {
+	db, err := sql.Open("sqlite3", "weather.db")
+	checkErr(err)
+
+	month := c.Params("month")
+	city := c.Params("City")
+	text, _ := url.QueryUnescape(city)
+	s := c.Params("tempture")
+	str := "Insert into Weather (City,tempture,month) values ('" + text + "'," + s + "," + month + ")"
+	fmt.Println(str)
+	_, err = db.Exec("Insert into Weather (City,tempture,month) values ('" + text + "'," + s + "," + month + ")")
+	if err == nil {
+		return c.SendString("成功新增")
+	} else {
+		return c.SendString("新增失敗,已有")
+	}
+
+}
+
+func Mod_temp(c *fiber.Ctx) error {
+	db, err := sql.Open("sqlite3", "weather.db")
+	checkErr(err)
+
+	month := c.Params("month")
+	city := c.Params("City")
+	text, _ := url.QueryUnescape(city)
+	s := c.Params("tempture")
+	str := "Update Weather set tempture=" + s + " where City='" + text + "' and month=" + month
+	fmt.Println(str)
+	_, err = db.Exec("Update Weather set tempture=" + s + " where City='" + text + "'and month=" + month)
+	checkErr(err)
+	fmt.Println(err)
+
+	if err == nil {
+		return c.SendString("成功修改")
+	} else {
+		return c.SendString("修改失敗")
 	}
 
 }

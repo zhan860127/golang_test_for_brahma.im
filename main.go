@@ -41,18 +41,15 @@ func initDatabase() {
 
 func setupRoutes(app *fiber.App) {
 	app.Get("/api/v1/weather", weather.Getweathers)
-	//	app.Static("/", "./weather.html")
-	app.Post("/", weather.Newtemp)
-
-	app.Get("/:value", func(c *fiber.Ctx) error {
-		return c.SendString("value: " + c.Params("value"))
-	})
-
+	app.Static("/", "./weather.html")
+	app.Post("/post", weather.Newtemp)
+	app.Get("api/v1/new/:City/:month/:tempture", weather.Newtemp_api)
 	app.Get("/api/v1/weather/:City/:month", weather.Getweather)
+	app.Get("api/v1/modify/:City/:month/:tempture", weather.Mod_temp)
 	app.Get("/api/v1/del/:City/:month", weather.Deltemp)
 	//	app.Post("/api/v1/weather", weather.Newweather)
 	//	app.Delete("/api/v1/weather/:id/:month", weather.Deleteweather)
-	app.Listen(":7802")
+	app.Listen(":7800")
 }
 
 func checkErr(err error) {

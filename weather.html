@@ -1,0 +1,68 @@
+<html>
+
+<head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <style type="text/css">
+        #songResJson {
+            border: 1px solid #8d8c8c;
+            padding: 5px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+    </style>
+    <title></title>
+</head>
+
+<body>
+    <div class="apiResult">
+        <h2> 氣溫圖</h2>
+    </div>
+    <form action="/post" method="post">
+        城市:<input type="text" name="city">
+        氣溫:<input type="text" οnkeyup="this.value=this.value.replace(/\D/g,'')" name="tempture">
+        月份:<input type="number" name="month">
+        <input type="submit" value="輸入">
+    </form>
+</body>
+
+</html>
+
+<script>
+
+    $.ajax({
+        url: 'http://127.0.0.1:7802/api/v1/weather',
+        dataType: 'json',
+        type: "GET",
+        data: {
+            message: 'Hello World'
+        },
+        success: function (data) {
+            console.log(data)
+            let tb = json2Table(data, ['City', 'Jan', 'Feb', 'Mar', 'Apr', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']);
+            document.body.appendChild(tb);
+        }
+    }
+    )
+    function json2Table(json, colNames) {
+        let tbCfg = [
+            { tag: 'thead', tag2: 'th', data: [colNames] },
+            { tag: 'tbody', tag2: 'td', data: json, keys: colNames },
+        ];
+        return tbCfg.reduce((tb, cfg) => {
+            if (cfg.keys === undefined) {
+                cfg.keys = cfg.data[0].map((x, i) => i);
+            }
+            tb.appendChild(cfg.data.reduce((tag, row) => {
+                tag.appendChild(cfg.keys.reduce((tr, k) => {
+                    let cell = document.createElement(cfg.tag2);
+                    cell.textContent = row[k];
+                    tr.appendChild(cell);
+                    return tr;
+                }, document.createElement('tr')));
+                return tag;
+            }, document.createElement(cfg.tag)));
+            return tb;
+        }, document.createElement('table'));
+    }
+</script>
