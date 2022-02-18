@@ -1,0 +1,133 @@
+basePath: /
+host: localhost:7800
+info:
+  contact:
+    email: zhan860127.gmail.com
+    name: API Support
+  description: This is a sample swagger for Fiber
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: Weather CRUD API
+  version: "1.0"
+paths:
+  /api/v1/del/{City}/{month}/{tempture}:
+    get:
+      parameters:
+      - description: City
+        in: header
+        name: City
+        required: true
+        type: string
+      - description: month
+        in: path
+        name: month
+        required: true
+        type: integer
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: 成功刪除
+          schema:
+            type: string
+        "404":
+          description: 刪除失敗
+          schema:
+            type: string
+      summary: delect the tempture in city on month
+      tags:
+      - Weather
+  /api/v1/modify/{City}/{month}/{tempture}:
+    get:
+      parameters:
+      - description: City
+        in: header
+        name: City
+        required: true
+        type: string
+      - description: month
+        in: path
+        name: month
+        required: true
+        type: integer
+      - description: tempture
+        in: path
+        name: tempture
+        required: true
+        type: number
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: 成功修改
+          schema:
+            type: string
+        "404":
+          description: 修改失敗
+          schema:
+            type: string
+      summary: Modify the tempture in city on month
+      tags:
+      - Weather
+  /api/v1/new/{City}/{month}/{tempture}:
+    get:
+      parameters:
+      - description: City
+        in: header
+        name: City
+        required: true
+        type: string
+      - description: month
+        in: path
+        name: month
+        required: true
+        type: integer
+      - description: tempture
+        in: path
+        name: tempture
+        required: true
+        type: number
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: 成功新增
+          schema:
+            type: string
+        "404":
+          description: 查詢失敗
+          schema:
+            type: string
+      summary: create the tempture in city on month
+      tags:
+      - Weather
+  /api/v1/weather/{City}/{month}:
+    get:
+      parameters:
+      - description: City
+        in: header
+        name: City
+        required: true
+        type: string
+      - description: month
+        in: path
+        name: month
+        required: true
+        type: integer
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: 查詢月份之城市溫度
+          schema:
+            type: number
+        "404":
+          description: 查詢失敗
+          schema:
+            type: string
+      summary: Get City_month Tempture
+      tags:
+      - Weather
+swagger: "2.0"

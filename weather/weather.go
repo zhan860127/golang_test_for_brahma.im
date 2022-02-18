@@ -52,6 +52,15 @@ func Getweathers(c *fiber.Ctx) error {
 	return c.JSON(b)
 }
 
+// @Summary Get City_month Tempture
+// @Tags Weather
+// @version 1.0
+// @produce text/plain
+// @param City header string true "City"
+// @param month path int true "month"
+// @Success 200 {number} 0.0 "查詢月份之城市溫度"
+// @Failure 404 {string} Sorry,not found! "查詢失敗"
+// @Router /api/v1/weather/{City}/{month} [get]
 func Getweather(c *fiber.Ctx) error {
 	db, err := sql.Open("sqlite3", "weather.db")
 	checkErr(err)
@@ -69,13 +78,22 @@ func Getweather(c *fiber.Ctx) error {
 	checkErr(err)
 	//	fmt.Println(rows)
 	var temp float64
-
+	var b int
+	b = 1
 	for rows.Next() {
+		fmt.Println(a)
 		rows.Scan(&temp)
 		fmt.Println(temp)
+		b = b + 1
 	}
+
 	strKm := strconv.FormatFloat(temp, 'f', 1, 64)
-	return c.SendString(string(strKm))
+
+	if b > 1 {
+		return c.SendString(string(strKm))
+	} else {
+		return fiber.NewError(404, "Sorry, not found!")
+	}
 }
 
 /*
@@ -87,7 +105,16 @@ func GetBook(c *fiber.Ctx) {
 	c.JSON(book)
 }
 */
-
+// @Summary create the tempture in city on month
+// @Tags Weather
+// @version 1.0
+// @produce text/plain
+// @param City header string true "City"
+// @param month path int true "month"
+// @param tempture path number true "tempture"
+// @Success 200 {string} Sorry,not found! "成功新增"
+// @Failure 404 {string} Sorry,not  "查詢失敗"
+// @Router /api/v1/new/{City}/{month}/{tempture} [get]
 func Newtemp(c *fiber.Ctx) error {
 	db, err := sql.Open("sqlite3", "weather.db")
 	checkErr(err)
@@ -117,11 +144,20 @@ func Newtemp(c *fiber.Ctx) error {
 	if row != nil {
 		return c.SendString("成功新增")
 	} else {
-		return c.SendString("新增失敗")
+		return fiber.NewError(404, "Sorry,新增失敗")
 	}
 
 }
 
+// @Summary delect the tempture in city on month
+// @Tags Weather
+// @version 1.0
+// @produce text/plain
+// @param City header string true "City"
+// @param month path int true "month"
+// @Success 200 {string} Sorry,not found! "成功刪除"
+// @Failure 404 {string} Sorry,not  "刪除失敗"
+// @Router /api/v1/del/{City}/{month}/{tempture} [get]
 func Deltemp(c *fiber.Ctx) error {
 	db, err := sql.Open("sqlite3", "weather.db")
 	checkErr(err)
@@ -135,7 +171,7 @@ func Deltemp(c *fiber.Ctx) error {
 	if err != nil {
 		return c.SendString("成功刪除")
 	} else {
-		return c.SendString("刪除失敗")
+		return fiber.NewError(404, "Sorry,刪除失敗")
 	}
 
 }
@@ -154,11 +190,21 @@ func Newtemp_api(c *fiber.Ctx) error {
 	if err == nil {
 		return c.SendString("成功新增")
 	} else {
-		return c.SendString("新增失敗,已有")
+		return fiber.NewError(404, "Sorry,新增失敗")
 	}
 
 }
 
+// @Summary Modify the tempture in city on month
+// @Tags Weather
+// @version 1.0
+// @produce text/plain
+// @param City header string true "City"
+// @param month path int true "month"
+// @param tempture path number true "tempture"
+// @Success 200 {string} Sorry,not found! "成功修改"
+// @Failure 404 {string} Sorry,not  "修改失敗"
+// @Router /api/v1/modify/{City}/{month}/{tempture} [get]
 func Mod_temp(c *fiber.Ctx) error {
 	db, err := sql.Open("sqlite3", "weather.db")
 	checkErr(err)
@@ -174,9 +220,10 @@ func Mod_temp(c *fiber.Ctx) error {
 	fmt.Println(err)
 
 	if err == nil {
+
 		return c.SendString("成功修改")
 	} else {
-		return c.SendString("修改失敗")
+		return fiber.NewError(404, "Sorry,修改失敗")
 	}
 
 }
