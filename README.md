@@ -6,7 +6,7 @@
 $ go run main.go 
 ```
 
-The server will start  at [Demo_Site](https://localhost:7800)
+The server will start  at [Demo_Site](http://127.0.0.1/7800/) and [sign_in](http://127.0.0.1/7800/sign)
 
 ## API Document
 Run it, and browser to http://127.0.0.1/7800/swagger, you can see Swagger 2.0 Api documents.
@@ -19,6 +19,9 @@ Click the tempture and the background will turn into yellow
 <br>
 When Click three times ,the site will alter the average of the record.
 ![](https://i.imgur.com/tptuJ8Q.png)
+
+
+
 
 
 
